@@ -1,5 +1,5 @@
 <h1 align="center">
-    Ensemble Price Forecasting
+    BTC & ETH & SOL Price Predict
 </h1>
 
 ---
