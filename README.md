@@ -30,11 +30,7 @@ This project produces **ensemble forecasts** of future asset prices (many simula
 
 This system provides high-quality synthetic price data and probabilistic forecasting. **Workers** generate multiple simulated price paths per request; paths must reflect real-world dynamics (volatility clustering, fat-tailed distributions). **Coordinators** score workers using the Continuous Ranked Probability Score (CRPS), which measures both calibration and sharpness of forecasts against actual price movements. Recent performance is weighted more heavily; emissions are allocated by relative performance.
 
-_Figure 1.1: System overview._
-
 The system aims to be a key source of synthetic price data for AI agents and for options trading and portfolio management.
-
-<sup>[Back to top ^][table-of-contents]</sup>
 
 ### 1.2. Task Presented to Workers
 
@@ -54,8 +50,6 @@ BTC 1.0 · ETH 0.67 · XAU 2.26 · SOL 0.59 · SPYX 2.99 · NVDAX 1.39 · TSLAX 
 Coordinators send requests (e.g. BTC/ETH at 30 min intervals). The worker has until the start time to return $N_{\text{sim}}$ paths. Use the Pyth Oracle (or equivalent) for the asset price at start_time. Late or invalid responses are scored 0 for that prompt.
 
 **1-Hour HFT:** The system also runs a short-horizon task (1 hour, BTC/ETH/SOL/XAU). Emissions split: 50% 24-hour predictions, 50% 1-hour HFT.
-
-<sup>[Back to top ^][table-of-contents]</sup>
 
 ### 1.3. Coordinator's Scoring Methodology
 
