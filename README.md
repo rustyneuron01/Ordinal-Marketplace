@@ -1,18 +1,6 @@
-<div align="center">
-  <img alt="Project logo" src="docs/images/logo.png" height="134" />
-</div>
-
 <h1 align="center">
     Ensemble Price Forecasting
 </h1>
-
-<div align="center">
-    <a href="#"><b>Resources</b></a>
-</div>
-
----
-
-<div align="center">[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)][license]</div>
 
 ---
 
@@ -42,40 +30,13 @@ This project produces **ensemble forecasts** of future asset prices (many simula
 
 This system provides high-quality synthetic price data and probabilistic forecasting. **Workers** generate multiple simulated price paths per request; paths must reflect real-world dynamics (volatility clustering, fat-tailed distributions). **Coordinators** score workers using the Continuous Ranked Probability Score (CRPS), which measures both calibration and sharpness of forecasts against actual price movements. Recent performance is weighted more heavily; emissions are allocated by relative performance.
 
-<div align="center">
-    <img alt="Overview diagram" src="docs/images/synth_diagram@1920x1080.png" />
-</div>
-
-*Figure 1.1: System overview.*
+_Figure 1.1: System overview._
 
 The system aims to be a key source of synthetic price data for AI agents and for options trading and portfolio management.
 
 <sup>[Back to top ^][table-of-contents]</sup>
 
 ### 1.2. Task Presented to Workers
-
-```mermaid
-sequenceDiagram
-    participant Worker
-    participant Coordinator
-    participant Storage
-
-    loop Every Hour
-        Coordinator->>Worker: Request with input prompts
-        note left of Coordinator: asset='BTC', start_time='2025-02-10T14:59:00', time_increment=300, etc.
-
-        Worker-->>Coordinator: Prediction results
-        note right of Worker: result: price prediction <br/> [[{"time": "2025-02-10T14:59:00+00:00", "price": 97352.60591372}, ...], ...]
-
-        Coordinator->>Coordinator: Run "prediction results" validation function
-
-        alt Validation error
-            Coordinator->>Storage: Save error
-        else No errors
-            Coordinator->>Storage: Save prediction results
-        end
-    end
-```
 
 Workers provide **probabilistic forecasts** of future price movements: multiple simulated price paths per asset over specified time increments and horizon. Current request format: **1000 simulated paths** for BTC, ETH, SOL, XAU (and tokenized equities SPYX, NVDAX, TSLAX, AAPLX, GOOGLX) over 24 hours at 5-minute increments. The system focuses on **quantifying uncertainty**—paths should represent the worker’s view of the probability distribution and encapsulate realistic dynamics (volatility clustering, fat tails).
 
@@ -114,32 +75,7 @@ The first term is average absolute error vs. observation; the second term accoun
 
 CRPS is applied over several intervals (e.g. 5 min, 30 min, 3 h, 24 h). For each increment: predicted price changes (from worker paths), observed price changes (from real prices, e.g. Pyth at each step), then CRPS. The **final score for a worker for one prompt** is the sum of CRPS over all increments.
 
-<sup>[Back to top ^][table-of-contents]</sup>
-
 ### 1.4. Calculation of Leaderboard Score
-
-```mermaid
-sequenceDiagram
-    loop Every Hour
-        participant Coordinator
-        participant Storage
-        participant PricesProvider as Prices Provider
-        participant Network
-
-        Coordinator->>Storage: Get prediction (at least 24 hours old)
-        Coordinator->>PricesProvider: Get real prices
-        Coordinator->>Coordinator: Calculate CRPS
-        Coordinator->>Coordinator: Get Best Score
-        Coordinator->>Coordinator: Assign 90th Percentile Score to Invalid and Worst 10% scores
-        Coordinator->>Coordinator: Subtract Best Score from all scores
-        Coordinator->>Coordinator: Save scores
-        Coordinator->>Storage: Get scores for past days
-        Coordinator->>Coordinator: Calculate moving average
-        Coordinator->>Coordinator: Softmax to get final weights
-        Coordinator->>Storage: Save final weights
-        Coordinator->>Network: Send final weights
-    end
-```
 
 #### CRPS Transformation
 
@@ -167,29 +103,27 @@ with $\beta = -0.1$ and $E(t)$ total emission at time $t$.
 
 ### 1.5. Overall Purpose
 
-1. **CRPS scoring** — Objective measure of forecast quality across time increments.  
-2. **Ensemble forecasts** — CRPS from finite simulations.  
-3. **Multiple time increments** — Short- and long-term evaluation.  
-4. **Moving average** — Rewards consistency.  
+1. **CRPS scoring** — Objective measure of forecast quality across time increments.
+2. **Ensemble forecasts** — CRPS from finite simulations.
+3. **Multiple time increments** — Short- and long-term evaluation.
+4. **Moving average** — Rewards consistency.
 5. **Softmax allocation** — Emissions proportional to performance.
-
-<sup>[Back to top ^][table-of-contents]</sup>
 
 ---
 
 ## 2. Tech stack
 
-| Category | Technologies |
-|----------|---------------|
-| **Language & runtime** | Python 3.11 |
-| **ML / volatility** | XGBoost (volatility prediction from cached features) |
-| **Numerics & scoring** | NumPy, Pandas, properscoring (CRPS) |
-| **Price data** | Pyth (Hermes) API; cached data for volatility training |
-| **Backend & API** | Pydantic, async request handling |
-| **Data & storage** | PostgreSQL, SQLAlchemy, Alembic |
-| **Observability** | Google Cloud Logging, Weights & Biases (optional) |
-| **DevOps** | Docker, Docker Compose |
-| **Testing** | pytest, CRPS/validation/simulation fixtures |
+| Category               | Technologies                                           |
+| ---------------------- | ------------------------------------------------------ |
+| **Language & runtime** | Python 3.11                                            |
+| **ML / volatility**    | XGBoost (volatility prediction from cached features)   |
+| **Numerics & scoring** | NumPy, Pandas, properscoring (CRPS)                    |
+| **Price data**         | Pyth (Hermes) API; cached data for volatility training |
+| **Backend & API**      | Pydantic, async request handling                       |
+| **Data & storage**     | PostgreSQL, SQLAlchemy, Alembic                        |
+| **Observability**      | Google Cloud Logging, Weights & Biases (optional)      |
+| **DevOps**             | Docker, Docker Compose                                 |
+| **Testing**            | pytest, CRPS/validation/simulation fixtures            |
 
 ---
 
@@ -210,18 +144,3 @@ with $\beta = -0.1$ and $E(t)$ total emission at time $t$.
 pip install -r requirements-dev.txt
 pre-commit install
 ```
-
-<sup>[Back to top ^][table-of-contents]</sup>
-
----
-
-## 📄 4. License
-
-See the [LICENSE][license] file.
-
-<sup>[Back to top ^][table-of-contents]</sup>
-
-<!-- links -->
-
-[license]: LICENSE
-[table-of-contents]: #table-of-contents
