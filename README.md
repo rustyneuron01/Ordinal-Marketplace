@@ -124,23 +124,3 @@ with $\beta = -0.1$ and $E(t)$ total emission at time $t$.
 | **Observability**      | Google Cloud Logging, Weights & Biases (optional)      |
 | **DevOps**             | Docker, Docker Compose                                 |
 | **Testing**            | pytest, CRPS/validation/simulation fixtures            |
-
----
-
-## 🪄 3. Usage
-
-### 3.1. Workers
-
-- **Tutorial:** [Worker tutorial](./docs/miner_tutorial.md) — set up and run a worker.
-- **Reference:** [Worker reference](./docs/miner_reference.md) (options, FAQs, troubleshooting).
-
-### 3.2. Coordinators
-
-- **Guide:** [Coordinator guide](./docs/validator_guide.md) — set up and run a coordinator.
-
-### 3.3. Develop
-
-```shell
-pip install -r requirements-dev.txt
-pre-commit install
-```
